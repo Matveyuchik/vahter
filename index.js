@@ -1,6 +1,7 @@
 const { Client, GatewayIntentBits, ActivityType, messageLink, Guild, EmbedBuilder, ActionRowBuilder, ButtonStyle, ComponentType, ButtonBuilder } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, VoiceConnectionStatus, getVoiceConnection, AudioPlayerStatus } = require('@discordjs/voice');
 const { token } = require('./config.json');
+const keepAlive = require('./server');
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates]
@@ -22,6 +23,15 @@ client.on('ready', readyClient => {
 client.on('guildCreate', (guild) => {
     guild.channels.cache.first().send("Здрасте, я короче тут у вас побуду, ок?");
 });
+
+const classica = [
+    'puahuho.mp3',
+    'symphony.mp3',
+    'turca.mp3',
+    'pganagigi.mp3',
+    'vivaldi.mp3',
+    'slavianka.mp3'
+]
 
 //commands
 client.on('messageCreate', async function(message){
@@ -179,7 +189,7 @@ client.on('messageCreate', async function(message){
         let member = message.mentions.members.first();
         if (!member) return message.reply('Гражданина не указали!');
 
-        const poligonRole = message.guild.roles.cache.find(role => role.name === "Подшконочный");
+        const poligonRole = message.guild.roles.cache.find(role => role.name === "Зек");
 
         if (!poligonRole) return message.reply('Роль не найдена почему то как так вообще.');
 
@@ -265,15 +275,15 @@ client.on('messageCreate', async function(message){
         }
     }
     if(command === "лелеле") {
-        message.reply("лелеле https://images-ext-1.discordapp.net/external/2KhjFcfyBfiVx4GEn1tkeQ2aDKly0yOCpmPF8594cws/https/media.tenor.com/3rZ2FUebPfAAAAPo/%25D0%25BB%25D0%25B8%25D1%2582%25D0%25B2%25D0%25B8%25D0%25BD-vibe.mp4");
+        message.reply("лелеле https://tenor.com/view/%D0%BB%D0%B8%D1%82%D0%B2%D0%B8%D0%BD-vibe-%D0%BB%D0%B8%D1%82%D0%B2%D0%B8%D0%BDvibe-gif-24627416");
     }
     if(command === "помощь") {
         const embed = new EmbedBuilder()
             .setTitle('Помощь')
             .setDescription('Пособие для новичков по крутому боту который создал matveyuchik')
             .addFields(
-                { name:"👨‍⚖️Модерация", value: "1. в!вмн - Высшая мера наказания. Формат в!вмн <пользователь> <причина (не обязательно)>\n2. в!депортация - кикнуть. Формат в!депортация <пользователь> <причина (не обязательно)>\n3. в!тихийчас - отправить в мут. Формат в!тихийчас <пользователь> <время в минутах> <причина (не обязательно)>\n4. в!блок - заблокировать канал.\n5. в!разблок - разблокировать канал.\n6. в!шконка - отправить под шконку. Формат в!шконка <пользователь> (НЕ ИСПОЛЬЗОВАТЬ НА ЮФ И ДРУГИХ СЕРВЕРАХ! БОТ СЛОМАЕТСЯ!)\n7. в!задержка - устанавливает кулдаун в канале. Формат в!задержка <время в секундах>", inline: true },
-                { name:"🥳Весёлые штучки", value: "1. в!лебозер - отправляет лебединое озеро в чат.\n2. в!шарик - отвечает на ваш вопрос (РАНДОМНО!!). Формат в!шарик <вопрос>\n3. в!яцарь? - говорит вам, царь вы или нет.\n~~4. в!кнб - камень ножеце бугага.~~\n5. в!часики - ⏲.\n6. в!лелеле - лелеле", inline:true },
+                { name:"👨‍⚖️Модерация", value: "1. в!вмн - Высшая мера наказания. Формат в!вмн <пользователь> <причина (не обязательно)>\n2. в!депортация - кикнуть. Формат в!депортация <пользователь> <причина (не обязательно)>\n3. в!тихийчас - отправить в мут. Формат в!тихийчас <пользователь> <время в минутах> <причина (не обязательно)>\n4. в!блок - заблокировать канал.\n5. в!разблок - разблокировать канал.\n6. в!шконка - отправить под шконку. Формат в!шконка <пользователь> (ИСПОЛЬЗОВАТЬ ТОЛЬКО НА ЮФ)\n7. в!задержка - устанавливает кулдаун в канале. Формат в!задержка <время в секундах>", inline: true },
+                { name:"🥳Весёлые штучки", value: "1. в!лебозер - отправляет лебединое озеро в чат.\n2. в!шарик - отвечает на ваш вопрос (РАНДОМНО!!). Формат в!шарик <вопрос>\n3. в!яцарь? - говорит вам, царь вы или нет.\n~~4. в!кнб - камень ножеце бугага.~~\n5. в!часики - ⏲.\n6. в!лелеле - лелеле.\n7. в!классика - 🎹", inline:true },
                 { name:"🔨Другое", value:"1. в!отключись - отключает бота, если он в войсе (а он такое может 🕵️‍♂️)", inline:true }
             );
         await message.reply({ embeds: [embed] });
@@ -322,6 +332,37 @@ client.on('messageCreate', async function(message){
             connection.disconnect();
         } else {
             message.reply('Я не в войсе.')
+        }
+    }
+    if (command === "классика") {
+        const channel = message.member?.voice.channel;
+        if(!channel) {
+            return message.reply('🎹');
+        }
+
+        try {
+            const connection = joinVoiceChannel({
+                channelId: channel.id,
+                guildId: message.guild.id,
+                adapterCreator: channel.guild.voiceAdapterCreator,
+            });
+            
+            let random = getRandomInt(0, classica.length);
+
+            const resource = createAudioResource(classica[random]);
+
+            const player = createAudioPlayer();
+
+            connection.subscribe(player);
+            player.play(resource);
+
+            player.on('stateChange', newState => {
+                if (newState == AudioPlayerStatus.Idle) {
+                    connection.disconnect();
+                }
+            });
+        } catch (err) {
+            console.error(err);
         }
     }
 });
